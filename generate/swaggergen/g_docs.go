@@ -291,31 +291,31 @@ func GenerateDocs(curpath string) {
 							for _, p := range params {
 								switch pp := p.(type) {
 								case *ast.CallExpr:
-									var controllerName string
+									//var controllerName string
 									if selname := pp.Fun.(*ast.SelectorExpr).Sel.String(); selname == "NSNamespace" {
 										s, params := analyseNewNamespace(pp)
 										for _, sp := range params {
 											switch pp := sp.(type) {
 											case *ast.CallExpr:
 												if pp.Fun.(*ast.SelectorExpr).Sel.String() == "NSInclude" {
-													controllerName = analyseNSInclude(s, pp)
-													if v, ok := controllerComments[controllerName]; ok {
-														rootapi.Tags = append(rootapi.Tags, swagger.Tag{
-															Name:        strings.Trim(s, "/"),
-															Description: v,
-														})
-													}
+													_ = analyseNSInclude(s, pp)
+													// if v, ok := controllerComments[controllerName]; ok {
+													// 	rootapi.Tags = append(rootapi.Tags, swagger.Tag{
+													// 		Name:        strings.Trim(s, "/"),
+													// 		Description: v,
+													// 	})
+													// }
 												}
 											}
 										}
 									} else if selname == "NSInclude" {
-										controllerName = analyseNSInclude("", pp)
-										if v, ok := controllerComments[controllerName]; ok {
-											rootapi.Tags = append(rootapi.Tags, swagger.Tag{
-												Name:        controllerName, // if the NSInclude has no prefix, we use the controllername as the tag
-												Description: v,
-											})
-										}
+										_ = analyseNSInclude("", pp)
+										// if v, ok := controllerComments[controllerName]; ok {
+										// 	rootapi.Tags = append(rootapi.Tags, swagger.Tag{
+										// 		Name:        controllerName, // if the NSInclude has no prefix, we use the controllername as the tag
+										// 		Description: v,
+										// 	})
+										// }
 									}
 								}
 							}
@@ -387,32 +387,32 @@ func analyseNSInclude(baseurl string, ce *ast.CallExpr) string {
 		}
 		if apis, ok := controllerList[cname]; ok {
 			for rt, item := range apis {
-				tag := cname
+				//tag := cname
 				if baseurl != "" {
 					rt = baseurl + rt
-					tag = strings.Trim(baseurl, "/")
+					//tag = strings.Trim(baseurl, "/")
 				}
-				if item.Get != nil {
-					item.Get.Tags = []string{tag}
-				}
-				if item.Post != nil {
-					item.Post.Tags = []string{tag}
-				}
-				if item.Put != nil {
-					item.Put.Tags = []string{tag}
-				}
-				if item.Patch != nil {
-					item.Patch.Tags = []string{tag}
-				}
-				if item.Head != nil {
-					item.Head.Tags = []string{tag}
-				}
-				if item.Delete != nil {
-					item.Delete.Tags = []string{tag}
-				}
-				if item.Options != nil {
-					item.Options.Tags = []string{tag}
-				}
+				// if item.Get != nil {
+				// 	item.Get.Tags = []string{tag}
+				// }
+				// if item.Post != nil {
+				// 	item.Post.Tags = []string{tag}
+				// }
+				// if item.Put != nil {
+				// 	item.Put.Tags = []string{tag}
+				// }
+				// if item.Patch != nil {
+				// 	item.Patch.Tags = []string{tag}
+				// }
+				// if item.Head != nil {
+				// 	item.Head.Tags = []string{tag}
+				// }
+				// if item.Delete != nil {
+				// 	item.Delete.Tags = []string{tag}
+				// }
+				// if item.Options != nil {
+				// 	item.Options.Tags = []string{tag}
+				// }
 				if len(rootapi.Paths) == 0 {
 					rootapi.Paths = make(map[string]*swagger.Item)
 				}
@@ -555,6 +555,8 @@ func parserComments(f *ast.FuncDecl, controllerName, pkgpath string) error {
 				opts.Description = strings.TrimSpace(t[len("@Description"):])
 			} else if strings.HasPrefix(t, "@Summary") {
 				opts.Summary = strings.TrimSpace(t[len("@Summary"):])
+			} else if strings.HasPrefix(t, "@Tag") {
+				opts.Tags = []string{strings.TrimSpace(t[len("@Tag"):])}
 			} else if strings.HasPrefix(t, "@Success") {
 				ss := strings.TrimSpace(t[len("@Success"):])
 				rs := swagger.Response{}
