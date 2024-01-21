@@ -157,7 +157,7 @@ func parsePackageFromDir(path string) error {
 }
 
 // GenerateDocs generates documentations for a given path.
-func GenerateDocs(curpath string, tags []string) {
+func GenerateDocs(curpath string, tags []string, apis []string) {
 	pkgspath := curpath
 	workspace := os.Getenv("BeeWorkspace")
 	if workspace != "" {
@@ -299,6 +299,21 @@ func GenerateDocs(curpath string, tags []string) {
 					delete(controllerValue, routerPath)
 				}
 			}
+		}
+	}
+
+	// fileter the controllerList by apis
+	if len(apis)>0 {
+		for key, controllerValue := range controllerList {
+			apiMap := make(map[string]*swagger.Item)
+			for _, api := range apis{
+				if item, ok := controllerValue[api]; ok {
+					apiMap[api] = item
+				} else {
+					beeLogger.Log.Warnf("api %s not found in controller %s", api, key)
+				}
+			}
+			controllerList[key] = apiMap
 		}
 	}
 
