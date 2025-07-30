@@ -278,7 +278,6 @@ func GenerateDocs(curpath string, tags []string, apis []string) {
 		for _, controllerValue := range controllerList {
 			for routerPath, item := range controllerValue {
 				var tags_ []string
-				var tags_ []string
 				if item.Get != nil {
 					tags_ = item.Get.Tags
 				} else if item.Post != nil {
